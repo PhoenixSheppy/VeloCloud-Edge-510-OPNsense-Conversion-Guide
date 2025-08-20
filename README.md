@@ -2,20 +2,20 @@
 These routers are cheaper than dirt on eBay, and they're just x86 boxes disguised as fancy cloud-managed routers, so let's repurpose them!
 
 ## Why do we need to do this?
-VeloCloud (VMware, Dell, VMware??) decided in their infinite wisdom to configure this device so that if you try any sketchy stuff, like running an unsupported(unauthorized) OS.
+VeloCloud (VMware, Dell, VMware??) decided in their infinite wisdom to configure this device so that if you try any sketchy stuff, like running an unsupported (unauthorized) OS.
 
 By default, it'll reboot after 60 seconds if it doesn't receive a response from a 'watchdog program' that's included with the factory OS.
 
 Some dudes probably way older than I am figured out how to get past that by performing some shinnanigans outlined in these instructions. 
 
-I took everything in (this forum post)[https://forum.netgate.com/topic/142371/what-is-this-board-help/1], and condensed it down (removed the unrelated stuff) so that we can convert these devices to literally anything else but VeloCloud OS.
+I took everything in [this forum post](https://forum.netgate.com/topic/142371/what-is-this-board-help/1), and condensed it down (removed the unrelated stuff) so that we can convert these devices to literally anything else but VeloCloud OS.
 
 ### Requirements:
 You will need the following items:
 
 * A "Velocloud SD-wan Edge 510 Managed Wireless Appliance" (Non-wireless models work as well, you'll be removing the wireless card anyway to complete this process!)
 * A USB-Flash drive, preferably 8GB or larger (This is to store the installer for OPNSense)
-* A Mini-PCIe to PCIe Adapter Kit, like [https://www.amazon.com/dp/B0C2WJXQBF](this one)
+* A Mini-PCIe to PCIe Adapter Kit, like [this one](https://www.amazon.com/dp/B0C2WJXQBF)
 * A GPU (cheap-o will work, I used a GT-710, any PCIe GPU made in the last 10 years should work)
 * An ATX PSU (This is required to power the PCIe-board in the adapter kit)
 * A Screwdriver kit, including a star-bit set (Literally just get an iFixit Kit)
@@ -96,4 +96,4 @@ Allow it to install, then change your root password (please lord god do this lol
 
 Remove the Mini-PCIe to PCIe kit, button up the device, and *presto!* You've turned this literal e-waste router into a new-fancy router for the modern age! **Look at you, superstar!**
 
-<img src="https://raw.githubusercontent.com/PhoenixSheppy/VeloCloud-Edge-510-OPNsense-Conversion-Guide/refs/heads/main/pics/superstar.jpg" height="100">
+<img src="https://raw.githubusercontent.com/PhoenixSheppy/VeloCloud-Edge-510-OPNsense-Conversion-Guide/refs/heads/main/pics/superstar.jpg" height="250">
