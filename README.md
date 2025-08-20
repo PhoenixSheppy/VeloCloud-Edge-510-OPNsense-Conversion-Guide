@@ -74,8 +74,6 @@ Follow that with this command: `./dmi-tool -w -p EDGE510 -v 1`
 
 Finally, flash that firmware by running `flashrom --programmer internal illegal-firmware/2017-4-10-coreboot.rom` and let it install. Once finished, proceed.
 
-Then, you should probably run 
-
 **FINISH HIM!!!** - to finalize getting rid of that *pesky watchdog* timer that prohibits us from running whatever we want, run the following, in order:
 `i2cset -y 1 0x24 0x00 0x00`
 `i2cset -y 1 0x24 0x01 0x00`
