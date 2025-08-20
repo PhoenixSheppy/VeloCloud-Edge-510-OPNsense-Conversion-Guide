@@ -2,7 +2,7 @@
 These routers are cheaper than dirt on eBay, and they're just x86 boxes disguised as fancy cloud-managed routers, so let's repurpose them!
 
 ## Why do we need to do this?
-VeloCloud (VMware, Dell, VMware??) decided in their infinite wisdom to configure this device so that if you try any sketchy stuff, like running an unsupported (unauthorized) OS.
+VeloCloud (VMware, Dell, VMware??) decided in their infinite wisdom to configure this device so that if you try any sketchy stuff, like running an unsupported (unauthorized) OS it won't work.
 
 By default, it'll reboot after 60 seconds if it doesn't receive a response from a 'watchdog program' that's included with the factory OS.
 
