@@ -36,6 +36,8 @@ Start by removing the serial-port / SIM-card slot cover on the side with the eth
 
 Then, remove all 4 feet, and the 4 star-bit screws holding the shell to the top of the device.
 
+Now, remove the top shell from the device, exposing the mainboard.
+
 ## Step 3: (If applicable) Remove the wireless card:
 
 Remove the wireless card by unplugging the antennas, and removing the (1) screw holding it down (SAVE THIS!) and put it aside.
@@ -54,7 +56,7 @@ Finally, seat your GPU into the external PCIe board, and plug in your power supp
 
 (Obviously, plug the GPU into your monitor using whatever cable works)
 
-## Step 5: Let's flash some shit!
+## Step 5: Let's flash it!
 
 Now, plug your mini-USB cable into the device, and the other end to your PC. Using a program like Tabby.sh (My personal preference, ymmv) or Putty, connect at 115200 Baud, and plug in the device, you should see some output as it boots up. Allow it to boot into VeloCloud OS.
 
@@ -80,7 +82,7 @@ Finally, flash that firmware by running `flashrom --programmer internal illegal-
 
 After you've run those two commands, your device is **FREE** from VMware/VeloCloud's *shackles*! *You can run whatever you want on it*! 
 
-Windows? **FUCK YEAH!** 
+Windows? **HELL YEAH!** 
 
 MacOS? *Man you must really hate yourself...* 
 
