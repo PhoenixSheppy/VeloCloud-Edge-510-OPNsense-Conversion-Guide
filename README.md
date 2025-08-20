@@ -80,7 +80,13 @@ Then, you should probably run
 `i2cset -y 1 0x24 0x00 0x00`
 `i2cset -y 1 0x24 0x01 0x00`
 
-After you've run those two commands, your device is **FREE** from VMware/VeloCloud's *shackles*! *You can run whatever you want on it*! Windows? **FUCK YEAH**. MacOS? *Man you must really hate yourself*. OPNSense? ***THAT'S WHY YOU'RE HERE!***
+After you've run those two commands, your device is **FREE** from VMware/VeloCloud's *shackles*! *You can run whatever you want on it*! 
+
+Windows? **FUCK YEAH!** 
+
+MacOS? *Man you must really hate yourself...* 
+
+OPNSense? ***THAT'S WHY YOU'RE HERE!***
 
 ## Step 6: Install OPNsense:
 
