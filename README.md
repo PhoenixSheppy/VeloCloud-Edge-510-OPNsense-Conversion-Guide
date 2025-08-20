@@ -94,6 +94,8 @@ Then, install using UFS (ZFS seems silly here since we only have 1 physical stor
 
 Allow it to install, then change your root password (please lord god do this lol) and shutdown.
 
-Remove the Mini-PCIe to PCIe kit, button up the device, and *presto!* You've turned this literal e-waste router into a new-fancy router for the modern age! **Look at you, superstar!**
+Remove the Mini-PCIe to PCIe kit, button up the device, and *presto!* You've turned this literal e-waste router into a new-fancy router for the modern age! 
+
+**Look at you, superstar!**
 
 <img src="https://raw.githubusercontent.com/PhoenixSheppy/VeloCloud-Edge-510-OPNsense-Conversion-Guide/refs/heads/main/pics/superstar.jpg" height="250">
