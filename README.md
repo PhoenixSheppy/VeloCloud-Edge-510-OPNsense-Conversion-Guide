@@ -128,7 +128,7 @@ Remove the Mini-PCIe to PCIe kit, button up the device, and *presto!* You've tur
 
 <img src="https://raw.githubusercontent.com/PhoenixSheppy/VeloCloud-Edge-510-OPNsense-Conversion-Guide/refs/heads/main/pics/single_core_test.jpg" height="250">
 
-<img src="https://raw.githubusercontent.com/PhoenixSheppy/VeloCloud-Edge-510-OPNsense-Conversion-Guide/refs/heads/main/pics/multi-core-test.jpg" height="250">
+<img src="https://raw.githubusercontent.com/PhoenixSheppy/VeloCloud-Edge-510-OPNsense-Conversion-Guide/refs/heads/main/pics/multi_core_test.jpg" height="250">
 
 * The M-key Slot on the motherboard does not work, as far as I know it does not show up in any OS I've tested, and cannot be used to boot from.
 
