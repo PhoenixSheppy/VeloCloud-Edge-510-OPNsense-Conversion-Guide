@@ -36,11 +36,17 @@ Start by removing the serial-port / SIM-card slot cover on the side with the eth
 
 Then, remove all 4 feet, and the 4 star-bit screws holding the shell to the top of the device.
 
+<img src="https://raw.githubusercontent.com/PhoenixSheppy/VeloCloud-Edge-510-OPNsense-Conversion-Guide/refs/heads/main/pics/back_case.jpg" height="250">
+
 Now, remove the top shell from the device, exposing the mainboard.
+
+<img src="https://raw.githubusercontent.com/PhoenixSheppy/VeloCloud-Edge-510-OPNsense-Conversion-Guide/refs/heads/main/pics/remove_cover.jpg" height="250">
 
 ## Step 3: (If applicable) Remove the wireless card:
 
 Remove the wireless card by unplugging the antennas, and removing the (1) screw holding it down (SAVE THIS!) and put it aside.
+
+<img src="https://raw.githubusercontent.com/PhoenixSheppy/VeloCloud-Edge-510-OPNsense-Conversion-Guide/refs/heads/main/pics/remove_wireless_card.jpg" height="250">
 
 *If you're like me, and don't plan on using the wireless at all, rip those antennas out and toss them in the trash.*
 
@@ -48,13 +54,23 @@ Remove the wireless card by unplugging the antennas, and removing the (1) screw 
 
 Start by installing the adapter-card where the wireless card was inserted, and affix it to the board using the screw you saved from earlier.
 
+<img src="https://raw.githubusercontent.com/PhoenixSheppy/VeloCloud-Edge-510-OPNsense-Conversion-Guide/refs/heads/main/pics/install_mini_pcie_adapter.jpg" height="250">
+
 Then, plug the included cable into the card and the other end into the external PCIe board.
+
+<img src="https://raw.githubusercontent.com/PhoenixSheppy/VeloCloud-Edge-510-OPNsense-Conversion-Guide/refs/heads/main/pics/install_cable_pcie_adapter.jpg" height="250">
 
 Next, plug the included power cable 6-pin into the PCIe board, and the other end into the SATA power cable on your ATX PSU.
 
+<img src="https://raw.githubusercontent.com/PhoenixSheppy/VeloCloud-Edge-510-OPNsense-Conversion-Guide/refs/heads/main/pics/install_power_pcie_adapter.jpg" height="250">
+
 Finally, seat your GPU into the external PCIe board, and plug in your power supply to the wall (DO NOT TURN IT ON YET)
 
+<img src="https://raw.githubusercontent.com/PhoenixSheppy/VeloCloud-Edge-510-OPNsense-Conversion-Guide/refs/heads/main/pics/install_gpu_pcie_adapter.jpg" height="250">
+
 (Obviously, plug the GPU into your monitor using whatever cable works)
+
+<img src="https://raw.githubusercontent.com/PhoenixSheppy/VeloCloud-Edge-510-OPNsense-Conversion-Guide/refs/heads/main/pics/install_hdmi_pcie_adapter.jpg" height="250">
 
 ## Step 5: Let's flash it!
 
@@ -105,3 +121,17 @@ Remove the Mini-PCIe to PCIe kit, button up the device, and *presto!* You've tur
 **Look at you, superstar!**
 
 <img src="https://raw.githubusercontent.com/PhoenixSheppy/VeloCloud-Edge-510-OPNsense-Conversion-Guide/refs/heads/main/pics/superstar.jpg" height="250">
+
+### Findings:
+
+* The theoretical throughput of this device, while using all CPUs onboard, is ~750mbps give or take. Single-core performance is ~350-500mbps.
+
+<img src="https://raw.githubusercontent.com/PhoenixSheppy/VeloCloud-Edge-510-OPNsense-Conversion-Guide/refs/heads/main/pics/single_core_test.jpg" height="250">
+
+<img src="https://raw.githubusercontent.com/PhoenixSheppy/VeloCloud-Edge-510-OPNsense-Conversion-Guide/refs/heads/main/pics/multi-core-test.jpg" height="250">
+
+* The M-key Slot on the motherboard does not work, as far as I know it does not show up in any OS I've tested, and cannot be used to boot from.
+
+* If you're worried about the internal flash dying, if/when it dies, boot priority is pre-configured to boot from USB first, so it'll work fine with a slim-USB drive in a pinch.
+
+* Patches / updates are about as slow as updating a Palo-Alto 220, slow and grueling, but that's mostly a limitation of the onboard eMMC. Flash drives (might) be faster.
