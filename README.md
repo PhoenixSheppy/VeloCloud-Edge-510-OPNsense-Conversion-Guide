@@ -136,114 +136,64 @@ Allow it to install, then change your root password (please lord god do this lol
 
 ## Step 7: Headless Serial Console Setup (No GPU Required)
 
-After installing OPNsense, you can manage the device entirely over serial — no GPU, no HDMI, no monitor needed. However, there are a few OPNsense quirks that need fixing before serial login works properly.
+After installing OPNsense, you can manage the device entirely over serial — no GPU, no HDMI, no monitor needed. Two things need configuring to make this work properly.
+
+> **Tested on:** OPNsense 26.1.6_2 (amd64)
+> The underlying hardware quirk has been reported to the OPNsense project as [opnsense/core#10463](https://github.com/opnsense/core/issues/10463). Check that issue to see if it has been addressed natively.
 
 ### Background: How the serial port works on this hardware
 
 The mini-USB port under the side cover exposes **two hardware UARTs** via an internal USB-to-serial chip:
 
-- **COM1 (0x3F8)** — FreeBSD calls this `ttyu0`, and it's where the FreeBSD kernel sends its console output by default
-- **COM2 (0x2F8)** — FreeBSD calls this `ttyu1`, and this is the port that coreboot and the FreeBSD bootloader use for their output
+- **COM1 (0x3F8)** — FreeBSD calls this `ttyu0`, where the FreeBSD kernel sends console output by default
+- **COM2 (0x2F8)** — FreeBSD calls this `ttyu1`, where coreboot and the FreeBSD bootloader send their output
 
-This means without any fixes, you'd see bootloader/module-loading output (from COM2) but then silence during OPNsense startup (which goes to COM1), followed by a login prompt on COM2. You'd also be unable to log in due to a PAM configuration issue.
+Although the port is physically connected via USB, coreboot presents both UARTs to FreeBSD as **native hardware UARTs** (not USB devices). FreeBSD therefore names them `ttyu0`/`ttyu1` (lowercase u, UART driver) — not `ttyU0`/`ttyU1` (uppercase U, USB ucom driver).
 
-The fixes below address all of this and make everything persist across reboots.
+Without any fixes, you'd see bootloader output (from COM2) then silence — the kernel switches to COM1 and no login prompt appears.
 
-### Fix 1: Full boot output on serial
+### Step 1: OPNsense console settings
 
-Add `comconsole_port="0x2f8"` to `/boot/loader.conf.local` to tell the FreeBSD kernel to use COM2 (the same port as the bootloader and your mini-USB):
+Under **System → Settings → Administration → Console**, configure as follows:
+
+<img src="pics/console-settings-v2.png" height="350">
+
+| Setting | Value |
+|---------|-------|
+| Console driver | Use the virtual terminal driver (vt) ✅ |
+| Primary Console | Serial Console |
+| Secondary Console | Serial Console |
+| Serial Speed | 115200 |
+| USB-based serial | ☐ **Leave unchecked** |
+| Console menu | Password protect the console menu ✅ |
+
+> **Important:** Leave "USB-based serial" **unchecked**. When enabled, OPNsense writes `ttyU` (uppercase) entries in `/etc/ttys` — but the actual device nodes on this hardware are `ttyu` (lowercase). Leaving it unchecked causes OPNsense to generate the correct lowercase entries that match the real device nodes.
+
+### Step 2: Point the kernel console to COM2
+
+By default the FreeBSD kernel uses COM1, but coreboot and the bootloader use COM2 (your mini-USB connection). Create `/boot/loader.conf.local` via SSH or the OPNsense shell:
 
 ```sh
 cat > /boot/loader.conf.local << 'EOF'
-boot_multicons="YES"
 comconsole_port="0x2f8"
 EOF
 ```
 
-### Fix 2: Serial login (persistent, survives reboots)
-
-OPNsense generates `/etc/ttys` with entries for `ttyU0` and `ttyU1` (uppercase U, for USB serial) when `serialusb` is set in its config. However, the actual FreeBSD device nodes are `ttyu0` and `ttyu1` (lowercase u). This mismatch means `getty` is configured for devices that don't exist — so no login prompt appears.
-
-Additionally, OPNsense's `/etc/pam.d/login` doesn't pass the required parameter to its PAM module, causing authentication to fail even if a prompt does appear.
-
-Both issues need to be fixed and made persistent using OPNsense's own mechanisms.
-
-#### 2a: PAM fix — make it persistent via OPNsense template system
-
-OPNsense regenerates PAM config from templates on every boot. Add a `login.pam` template so OPNsense generates a working `/etc/pam.d/login`:
-
-```sh
-# Create the login PAM template
-cat > /usr/local/opnsense/service/templates/OPNsense/Auth/login.pam << 'EOF'
-# $FreeBSD$
-#
-# login - auth-owner=root authenticate-with=opnsense
-#
-auth            sufficient      pam_opnsense.so         authtok_prompt=Password:
-auth            required        pam_unix.so             no_warn try_first_pass
-auth            optional        pam_group.so            no_warn group=wheel root_only fail_safe ruser
-auth            optional        pam_lastlog.so          no_warn
-
-account         required        pam_nologin.so
-account         required        pam_opnsense.so
-account         required        pam_unix.so
-account         required        pam_login_access.so
-
-password        required        pam_opnsense.so
-password        required        pam_unix.so             no_warn try_first_pass
-
-session         required        pam_lastlog.so          no_warn
-session         optional        pam_motd.so
-session         optional        pam_mail.so             no_warn quiet
-EOF
-
-# Register it in the template targets
-echo "login.pam:/etc/pam.d/login" >> /usr/local/opnsense/service/templates/OPNsense/Auth/+TARGETS
-
-# Apply immediately
-configctl template reload OPNsense/Auth
-```
-
-#### 2b: ttyU symlink fix — make it persistent via OPNsense syshook
-
-OPNsense has a syshook mechanism that runs scripts at specific points in the boot process. Create a script at `99-serial-console` (the high number ensures it runs after OPNsense's own console configuration at `20-freebsd`):
-
-```sh
-cat > /usr/local/etc/rc.syshook.d/start/99-serial-console << 'EOF'
-#!/bin/sh
-
-# Fix serial console: create ttyU symlinks and fix PAM login config.
-# Must run after 20-freebsd which calls system_login_configure().
-
-# OPNsense writes ttyU (uppercase) in /etc/ttys when serialusb=1,
-# but the actual FreeBSD device nodes are ttyu (lowercase).
-ln -sf /dev/ttyu0 /dev/ttyU0
-ln -sf /dev/ttyu0.init /dev/ttyU0.init
-ln -sf /dev/ttyu0.lock /dev/ttyU0.lock
-ln -sf /dev/ttyu1 /dev/ttyU1
-ln -sf /dev/ttyu1.init /dev/ttyU1.init
-ln -sf /dev/ttyu1.lock /dev/ttyU1.lock
-
-# Reload PAM templates to ensure login.pam is applied
-configctl template reload OPNsense/Auth
-
-# Signal init to re-read /etc/ttys and start gettys on the serial ports
-kill -HUP 1
-EOF
-
-chmod +x /usr/local/etc/rc.syshook.d/start/99-serial-console
-```
+> **Why `loader.conf.local` and not the Tunables UI?** OPNsense's Tunables page writes entries into `/boot/loader.conf`, but after the console initialisation block. By the time the loader reaches the tunable, the console is already initialised on COM1. `/boot/loader.conf.local` is read after `/boot/loader.conf` and correctly overrides the port before the console is finalised. OPNsense never overwrites this file — it's safe across reboots and OPNsense updates.
 
 ### Verifying it works
 
 Reboot the device. You should see:
 
-1. Full OPNsense boot sequence on your serial terminal (services starting, syshook output, etc.)
-2. `>>> Invoking start script 'serial-console'` followed by `OK` — confirming the syshook ran
-3. The OPNsense banner and a `login:` prompt on `ttyU1`
-4. Successful login with your `root` credentials
+1. Full OPNsense boot sequence on your serial terminal
+2. A `login:` prompt on `ttyu1`
+3. Successful login with your `root` credentials
 
 From this point the device is fully headless — no GPU, no monitor, serial console only.
+
+### Board Hardware Reference
+
+For a detailed PCB reference — connectors, headers, IC inventory, and unpopulated variant hardware — see **[docs/board-reference.md](docs/board-reference.md)**.
 
 ### Findings:
 
@@ -257,7 +207,7 @@ From this point the device is fully headless — no GPU, no monitor, serial cons
 
 * Speaking of LTE, yes, the LTE Sierra Wireless Snapdragon-X7 LTE-A card that comes in the -LTE SKUs does work with OPNSense!
 
-* The wireless-AC also works with OPNsense in the event that you choose to keep it!
+* The wireless-AC also works with OPNsense in the event that you choose to keep it! **Note:** This appears to apply to certain cards only. The COMPEX WLE600VX (QCA9880, 802.11ac) is detected on the PCI bus but has no FreeBSD driver — `ath10k` was never fully ported to FreeBSD. If you need wireless, replace it with an AR9xxx-based card supported by the `ath` driver.
 
 * If you're worried about the internal flash dying, if/when it dies, boot priority is pre-configured to boot from USB first, so it'll work fine with a slim-USB drive in a pinch.
 

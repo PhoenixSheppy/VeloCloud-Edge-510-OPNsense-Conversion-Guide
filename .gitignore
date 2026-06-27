@@ -1,0 +1,5 @@
+# Private folder — local only, never commit
+.private/
+
+# Scratch space — local only, never commit
+tmp/
